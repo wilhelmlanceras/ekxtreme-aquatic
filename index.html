@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EKxtreme Aquatic</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- 1. Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EKxtreme <span>Aquatic</span></a>
+      <nav class="nav-links">
+        <a href="fish.html">Fish</a>
+        <a href="tanks.html">Tank</a>
+        <a href="food.html">Food</a>
+        <a href="equipment.html">Equipment</a>
+        <a href="plants.html">Plant</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <a href="#compatibility" class="nav-btn" onclick="smoothScrollToCompatibility(event)">Compatibility Checker</a>
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="fish.html">Fish</a>
+      <a href="tanks.html">Tank</a>
+      <a href="food.html">Food</a>
+      <a href="equipment.html">Equipment</a>
+      <a href="plants.html">Plant</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+      <a href="#compatibility" class="mob-compat-btn" onclick="smoothScrollToCompatibility(event)">Compatibility
+        Checker</a>
+    </div>
+  </header>
+
+  <!-- 2. Hero Section -->
+  <section class="hero">
+    <video class="hero-video" autoplay muted loop>
+      <source src="assets/videos/website-video.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>EKxtreme Aquatic</h1>
+      <p class="hero-subtitle">Premium Aquarium Store in the UAE</p>
+      <p class="hero-text">Freshwater fish, tanks, aquascaping supplies, and premium aquatic livestock.</p>
+      <div class="hero-buttons">
+        <a href="#categories" class="btn primary">Shop Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Categories Section -->
+  <section class="categories" id="categories">
+    <h2 class="section-title">Shop by Categories</h2>
+    <div class="category-grid">
+      <a href="fish.html" class="category-card">
+        <img src="assets/images/categories/fish.jpg">
+        <span>Fish</span>
+      </a>
+      <a href="tanks.html" class="category-card">
+        <img src="assets/images/categories/tank.jpg">
+        <span>Tanks</span>
+      </a>
+      <a href="food.html" class="category-card">
+        <img src="assets/images/categories/food.jpg">
+        <span>Food</span>
+      </a>
+      <a href="equipment.html" class="category-card">
+        <img src="assets/images/categories/equipment.jpg">
+        <span>Equipment</span>
+      </a>
+      <a href="plants.html" class="category-card">
+        <img src="assets/images/categories/plant.jpg">
+        <span>Plants</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 4. Best Sellers Section -->
+  <section class="best-sellers">
+    <h2 class="section-title">Best Sellers</h2>
+    <div class="supplies-slider-wrapper">
+      <button class="slider-btn left" onclick="scrollBestSellers(-320)">&#10094;</button>
+      <div class="supplies-slider" id="bestSellersSlider"></div>
+      <button class="slider-btn right" onclick="scrollBestSellers(320)">&#10095;</button>
+    </div>
+  </section>
+
+  <!-- 5. Aquarium Supplies Section -->
+  <section class="supplies">
+    <h2 class="section-title">Aquarium Supplies</h2>
+    <div class="supplies-slider-wrapper">
+      <button class="slider-btn left" onclick="scrollSupplies(-320)">&#10094;</button>
+      <div class="supplies-slider" id="suppliesSlider"></div>
+      <button class="slider-btn right" onclick="scrollSupplies(320)">&#10095;</button>
+    </div>
+  </section>
+
+  <!-- 6. About Section -->
+  <section class="about" id="about">
+    <div style="max-width:900px; margin:auto; text-align:center;">
+      <h2 class="section-title">Your Trusted Aquarium Experts in the UAE</h2>
+      <p>With professional experience in aquascaping and aquatic livestock care,
+        EKxtreme Aquatic provides premium fish, tanks, and aquarium setups across the UAE.
+        <br><br>
+        We focus on healthy livestock, expert guidance, and long-term aquarium success.
+      </p>
+    </div>
+  </section>
+
+  <!-- 7. Compatibility Checker Section -->
+  <section class="compatibility" id="compatibility">
+    <h2 class="section-title">Fish Compatibility Checker</h2>
+    <p style="text-align:center; color:#64748b; margin-bottom:20px;">
+      Check if two fish can safely live together in the same tank.
+    </p>
+    <div class="compat-box">
+      <select id="fishA">
+        <option value="">Select Fish A</option>
+      </select>
+      <select id="fishB">
+        <option value="">Select Fish B</option>
+      </select>
+      <button class="btn primary" onclick="checkFishCompatibility()">Check Compatibility</button>
+      <p id="compatResult"></p>
+    </div>
+  </section>
+
+  <!-- 8. Testimonials Section -->
+  <section class="testimonials" id="testimonials">
+    <h2 class="section-title">Customer Reviews</h2>
+    <p class="review-subtitle">Rated 4.7 ★ on Google based on real customer experiences</p>
+    <div class="rating-summary">
+      <div class="rating-box">
+        <h1>4.7</h1>
+        <div class="stars">★★★★★</div>
+        <p>Overall Rating</p>
+      </div>
+    </div>
+    <div class="testimonial-grid">
+      <div class="testimonial-card">
+        <p>Very gentle sales person and helpful.</p>
+        <h4>Sachin Timothy</h4>
+        <span>★★★★★</span>
+      </div>
+      <div class="testimonial-card">
+        <p>Good quality of food for fish available, recommended.</p>
+        <h4>Just Shine</h4>
+        <span>★★★★★</span>
+      </div>
+      <div class="testimonial-card">
+        <p>Great collection of guppies!</p>
+        <h4>Lee Sevilla</h4>
+        <span>★★★★★</span>
+      </div>
+      <div class="testimonial-card">
+        <p>Very friendly and helpful guidance.</p>
+        <h4>Samrat Chatterjee</h4>
+        <span>★★★★★</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9. Footer Section -->
+  <footer class="footer" id="contact">
+    <div class="footer-container">
+      <div class="footer-column">
+        <h2 class="footer-logo">EKxtreme <span>Aquatic</span></h2>
+        <p>Premium aquarium fish, tanks, and aquatic solutions in the UAE.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <a href="fish.html">Fish</a>
+        <a href="tanks.html">Tank</a>
+        <a href="food.html">Food</a>
+        <a href="equipment.html">Equipment</a>
+        <a href="plants.html">Plant</a>
+      </div>
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Abu Dhabi, UAE</p>
+        <p>+971 52 317 9905</p>
+        <p>ekxtremeaquatic@gmail.com</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span onclick="window.open('admin-login.html', '_blank')" style="color:#94a3b8; cursor:default;">©</span>
+      2026 EKxtreme Aquatic. All Rights Reserved.
+    </div>
+  </footer>
+
+  <!-- 10. Firebase Module Logic -->
+  <script type="module">
+    import { db } from "/js/firebase.js";
+    import {
+      collection, getDocs, query, where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const fishA = document.getElementById("fishA");
+    const fishB = document.getElementById("fishB");
+    const result = document.getElementById("compatResult");
+    const bestSellersSlider = document.getElementById("bestSellersSlider");
+    const suppliesSlider = document.getElementById("suppliesSlider");
+
+    let fishList = [];
+
+    async function loadFish() {
+      const snap = await getDocs(collection(db, "fish"));
+      fishList = [];
+      fishA.innerHTML = `<option value="">Select Fish A</option>`;
+      fishB.innerHTML = `<option value="">Select Fish B</option>`;
+      snap.forEach(docSnap => {
+        const data = docSnap.data();
+        const fish = {
+          id: docSnap.id,
+          name: data.name,
+          temperament: (data.temperament || "peaceful").toLowerCase().trim()
+        };
+        fishList.push(fish);
+        const o1 = document.createElement("option");
+        o1.value = fish.id;
+        o1.textContent = fish.name;
+        const o2 = o1.cloneNode(true);
+        fishA.appendChild(o1);
+        fishB.appendChild(o2);
+      });
+    }
+
+    async function loadBestSellers() {
+      try {
+        const snap = await getDocs(query(collection(db, "fish"), where("bestSeller", "==", true)));
+        bestSellersSlider.innerHTML = "";
+        snap.forEach(docSnap => {
+          const item = docSnap.data();
+          const card = document.createElement("a");
+          card.className = "product-card";
+          card.href = `fish-detail.html?id=${docSnap.id}`;
+          card.innerHTML = `
+          <img src="${item.imageUrlLight || item.imageUrl || 'assets/images/placeholder.jpg'}" alt="${item.name}">
+          <div class="product-content">
+            <h3>${item.name || "Unnamed Fish"}</h3>
+            <p class="price">${item.price || ""}</p>
+          </div>`;
+          bestSellersSlider.appendChild(card);
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    async function loadSupplies() {
+      try {
+        const snap = await getDocs(query(collection(db, "equipment"), where("isSupply", "==", true)));
+        suppliesSlider.innerHTML = "";
+        snap.forEach(docSnap => {
+          const item = docSnap.data();
+          const card = document.createElement("a");
+          card.className = "product-card";
+          card.href = `equipment-detail.html?id=${docSnap.id}`;
+          card.innerHTML = `
+          <img src="${item.imageUrl || 'assets/images/placeholder.jpg'}" alt="${item.name}">
+          <div class="product-content">
+            <h3>${item.name || "Unnamed Item"}</h3>
+            <p class="price">${item.price || ""}</p>
+          </div>`;
+          suppliesSlider.appendChild(card);
+        });
+      } catch (e) { console.error(e); }
+    }
+
+    window.checkFishCompatibility = function () {
+      const aId = fishA.value;
+      const bId = fishB.value;
+      if (!aId || !bId) { result.innerText = "Please select both fish."; result.style.color = "orange"; return; }
+      if (aId === bId) { result.innerText = "✔ Same species — fully compatible."; result.style.color = "#2EC4B6"; return; }
+      const aFish = fishList.find(f => f.id === aId);
+      const bFish = fishList.find(f => f.id === bId);
+      const a = aFish.temperament;
+      const b = bFish.temperament;
+      if (a === "aggressive" || b === "aggressive") {
+        result.innerText = `❌ Not compatible — ${a === "aggressive" ? aFish.name : bFish.name} is aggressive.`;
+        result.style.color = "#ff4d4d";
+      } else if (a === "semi-aggressive" || b === "semi-aggressive") {
+        result.innerText = `⚠ Caution — Semi-aggressive fish may nip tankmates.`;
+        result.style.color = "#facc15";
+      } else {
+        result.innerText = `✔ Compatible — both fish are peaceful.`;
+        result.style.color = "#2EC4B6";
+      }
+    };
+
+    window.scrollBestSellers = (amount) => bestSellersSlider.scrollBy({ left: amount, behavior: "smooth" });
+    window.scrollSupplies = (amount) => suppliesSlider.scrollBy({ left: amount, behavior: "smooth" });
+
+    loadFish();
+    loadBestSellers();
+    loadSupplies();
+  </script>
+
+  <!-- 11. UI Interaction Logic -->
+  <script>
+    // Scroll Restoration
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
+    // Mobile Menu Toggle
+    function toggleMenu() {
+      document.getElementById("hamburgerBtn").classList.toggle("open");
+      document.getElementById("mobileMenu").classList.toggle("open");
+    }
+
+    // Reactive Navbar Logic
+    let lastScrollY = window.scrollY;
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        navbar.classList.add('navbar-hidden');
+      } else {
+        navbar.classList.remove('navbar-hidden');
+      }
+      lastScrollY = currentScrollY;
+    });
+
+    // Smooth Scroll for same-page clicks
+    function smoothScrollToCompatibility(e) {
+      e.preventDefault();
+      const target = document.getElementById('compatibility');
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById("hamburgerBtn").classList.remove("open");
+        document.getElementById("mobileMenu").classList.remove("open");
+      }
+    }
+
+    // Instant Redirect Scroll
+    window.addEventListener('DOMContentLoaded', () => {
+      if (window.location.hash === '#compatibility') {
+        const target = document.getElementById('compatibility');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  </script>
+
+</body>
+
+</html>

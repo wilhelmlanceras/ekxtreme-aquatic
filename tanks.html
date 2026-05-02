@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- 1. Document Setup -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tanks — EKxtreme Aquatic</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <!-- 2. Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="logo">EKxtreme <span>Aquatic</span></a>
+      <nav class="nav-links">
+        <a href="fish.html">Fish</a>
+        <a href="tanks.html">Tank</a>
+        <a href="food.html">Food</a>
+        <a href="equipment.html">Equipment</a>
+        <a href="plants.html">Plant</a>
+      </nav>
+      <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleMenu()">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="fish.html">Fish</a>
+      <a href="tanks.html">Tank</a>
+      <a href="food.html">Food</a>
+      <a href="equipment.html">Equipment</a>
+      <a href="plants.html">Plant</a>
+    </div>
+  </header>
+
+  <!-- 3. Catalog Header -->
+  <section class="catalog-header">
+    <h1>Aquarium Tanks</h1>
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search tanks...">
+    </div>
+  </section>
+
+  <!-- 4. Catalog Grid -->
+  <section class="catalog-grid" id="catalog"></section>
+
+  <!-- 5. Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-column">
+        <h2 class="footer-logo">EKxtreme <span>Aquatic</span></h2>
+        <p>Premium aquarium fish, tanks, and aquatic solutions in the UAE.</p>
+      </div>
+      <div class="footer-column">
+        <h3>Quick Links</h3>
+        <a href="fish.html">Fish</a>
+        <a href="tanks.html">Tank</a>
+        <a href="food.html">Food</a>
+        <a href="equipment.html">Equipment</a>
+        <a href="plants.html">Plant</a>
+      </div>
+      <div class="footer-column">
+        <h3>Contact</h3>
+        <p>Abu Dhabi, UAE</p>
+        <p>+971 52 317 9905</p>
+        <p>ekxtremeaquatic@gmail.com</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 EKxtreme Aquatic. All Rights Reserved.</div>
+  </footer>
+
+  <!-- 6. Firebase Logic -->
+  <script type="module">
+    import { db } from "/js/firebase.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const catalog = document.getElementById("catalog");
+    const searchInput = document.getElementById("searchInput");
+    let allTanks = [];
+
+    // Fetch tanks data
+    async function loadTanks() {
+      try {
+        const snapshot = await getDocs(collection(db, "tanks"));
+        allTanks = [];
+        snapshot.forEach((docSnap) => {
+          allTanks.push({ id: docSnap.id, ...docSnap.data() });
+        });
+        renderTanks(allTanks);
+      } catch (err) {
+        console.error("Load error:", err);
+        catalog.innerHTML = "<p style='text-align:center;'>Error loading tanks.</p>";
+      }
+    }
+
+    // Render tank cards
+    function renderTanks(list) {
+      catalog.innerHTML = "";
+      if (!list.length) {
+        catalog.innerHTML = "<p style='text-align:center;'>No tanks found.</p>";
+        return;
+      }
+      list.forEach((tank) => {
+        const stockColor = tank.stock > 0 ? "#22c55e" : "#ef4444";
+        const stockText = tank.stock > 0 ? `${tank.stock} left` : "Out of Stock";
+
+        const card = document.createElement("a");
+        card.className = "product-card";
+        card.href = `tanks-detail.html?id=${tank.id}`;
+        card.innerHTML = `
+        <img src="${tank.imageUrl || 'assets/images/placeholder.jpg'}">
+        <div class="product-content">
+          <h3>${tank.name || "Unnamed Tank"}</h3>
+          <p class="price">${tank.price || ""}</p>
+          <div class="info">
+            <p><span>Capacity</span><strong>${tank.capacity || "-"}</strong></p>
+            <p><span>Material</span><strong>${tank.material || "-"}</strong></p>
+            <p><span>Stock</span><strong style="color:${stockColor}">${stockText}</strong></p>
+          </div>
+        </div>`;
+        catalog.appendChild(card);
+      });
+    }
+
+    // Search functionality
+    searchInput.addEventListener("input", (e) => {
+      const value = e.target.value.toLowerCase().trim();
+      renderTanks(allTanks.filter((tank) =>
+        (tank.name || "").toLowerCase().includes(value) ||
+        (tank.material || "").toLowerCase().includes(value) ||
+        String(tank.capacity || "").toLowerCase().includes(value)
+      ));
+    });
+
+    loadTanks();
+  </script>
+
+  <!-- 7. UI Logic -->
+  <script>
+    function toggleMenu() {
+      document.getElementById("hamburgerBtn").classList.toggle("open");
+      document.getElementById("mobileMenu").classList.toggle("open");
+    }
+
+    let lastScrollY = window.scrollY;
+    const navbar = document.querySelector('.navbar');
+
+    window.addEventListener('scroll', () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        navbar.classList.add('navbar-hidden');
+      } else {
+        navbar.classList.remove('navbar-hidden');
+      }
+      lastScrollY = currentScrollY;
+    });
+  </script>
+
+</body>
+
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* 1. Dashboard Layout */
+    .admin-tabs {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 20px;
+      background: #0B0F14;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      border-radius: 30px;
+      border: 2px solid #2EC4B6;
+      background: transparent;
+      color: #2EC4B6;
+      font-family: 'Poppins', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.25s ease;
+    }
+
+    .tab-btn:hover,
+    .tab-btn.active {
+      background: #2EC4B6;
+      color: #0B0F14;
+    }
+
+    /* 2. Low Stock Styling */
+    .tab-btn.low-stock {
+      border-color: #facc15;
+      color: #facc15;
+    }
+
+    .tab-btn.low-stock.active,
+    .tab-btn.low-stock:hover {
+      background: #facc15;
+      color: #0B0F14;
+    }
+
+    .low-stock-badge {
+      display: inline-block;
+      background: #facc15;
+      color: #0B0F14;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* 3. Header & Status */
+    .admin-header {
+      text-align: center;
+      padding: 40px 20px 20px;
+      background: #0B0F14;
+    }
+
+    .admin-header h1 {
+      font-size: 32px;
+      color: #ffffff;
+    }
+
+    .admin-header p {
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+
+    .admin-header-actions {
+      margin-top: 16px;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .admin-status {
+      text-align: center;
+      padding: 40px 20px;
+      color: #94a3b8;
+      font-size: 15px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- 4. Header Section -->
+  <div class="admin-header">
+    <h1>Admin Dashboard</h1>
+    <p>Manage EKxtreme Aquatic Inventory</p>
+    <div class="admin-header-actions">
+      <a href="admin-add.html" class="btn primary">+ Add New Product</a>
+      <button class="btn secondary" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- 5. Navigation Tabs -->
+  <div class="admin-tabs">
+    <button class="tab-btn active" onclick="switchTab('fish', this)">Fish</button>
+    <button class="tab-btn" onclick="switchTab('tanks', this)">Tanks</button>
+    <button class="tab-btn" onclick="switchTab('food', this)">Food</button>
+    <button class="tab-btn" onclick="switchTab('equipment', this)">Equipment</button>
+    <button class="tab-btn" onclick="switchTab('plants', this)">Plants</button>
+    <button class="tab-btn low-stock" onclick="switchTab('low-stock', this)">Low Stock</button>
+  </div>
+
+  <!-- 6. Product List Display -->
+  <div id="admin-status" class="admin-status">Loading...</div>
+  <section id="admin-list" class="catalog-grid"></section>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      deleteDoc,
+      doc,
+      query,
+      where
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    /* 7. Firebase Configuration */
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4nhpU-2RAGys1u9g_Wiudquku2bBimYA",
+      authDomain: "ekxtreme-aquatic.firebaseapp.com",
+      projectId: "ekxtreme-aquatic",
+      storageBucket: "ekxtreme-aquatic.firebasestorage.app",
+      messagingSenderId: "475836775584",
+      appId: "1:475836775584:web:001169a1690998ea265dc5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const list = document.getElementById("admin-list");
+    const statusEl = document.getElementById("admin-status");
+    let currentTab = "fish";
+
+    /* 8. Auth State Observer */
+    onAuthStateChanged(auth, (user) => {
+      if (!user) { window.location.href = "admin-login.html"; return; }
+      loadCollection(currentTab);
+    });
+
+    /* 9. Tab Switching Logic */
+    window.switchTab = function (category, btn) {
+      currentTab = category;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      if (category === 'low-stock') {
+        loadLowStock();
+      } else {
+        loadCollection(category);
+      }
+    };
+
+    /* 10. Data Fetching Functions */
+    async function loadCollection(category) {
+      list.innerHTML = "";
+      statusEl.innerText = "Loading...";
+
+      try {
+        const snap = await getDocs(collection(db, category));
+        renderItems(snap, category);
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = "Error loading data: " + err.message;
+      }
+    }
+
+    async function loadLowStock() {
+      list.innerHTML = "";
+      statusEl.innerText = "Scanning all categories for low stock...";
+
+      const categories = ['fish', 'tanks', 'food', 'equipment', 'plants'];
+      let foundAny = false;
+
+      try {
+        for (const cat of categories) {
+          const q = query(collection(db, cat), where("stock", "<=", 5));
+          const snap = await getDocs(q);
+
+          if (!snap.empty) {
+            foundAny = true;
+            snap.forEach((d) => {
+              createCard(d.data(), d.id, cat);
+            });
+          }
+        }
+
+        if (!foundAny) {
+          statusEl.innerText = "All items are well stocked! (No items with 5 or less stock found).";
+        } else {
+          statusEl.innerText = "Showing items with 5 or less units remaining.";
+        }
+
+      } catch (err) {
+        console.error(err);
+        statusEl.innerText = "Error scanning stock: " + err.message;
+      }
+    }
+
+    /* 11. Card Rendering Helpers */
+    function renderItems(snap, category) {
+      if (snap.empty) {
+        statusEl.innerText = `No ${category} found.`;
+        return;
+      }
+      statusEl.innerText = "";
+      snap.forEach((d) => {
+        createCard(d.data(), d.id, category);
+      });
+    }
+
+    function createCard(item, id, category) {
+      const s = item.stock;
+
+      let stockColor = "#22c55e";
+      let stockText = s !== undefined ? `${s} in stock` : "Undefined Stock";
+      let badge = "";
+
+      if (s === 0) {
+        stockColor = "#ef4444";
+        stockText = "Out of Stock";
+      } else if (s <= 5 && s !== undefined) {
+        stockColor = "#facc15";
+        stockText = `${s} left - LOW STOCK`;
+        badge = `<span class="low-stock-badge">Near Empty</span>`;
+      } else if (s === undefined) {
+        stockColor = "#ef4444";
+        stockText = "Undefined Stock";
+      }
+
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.innerHTML = `
+      <img src="${item.imageUrl || 'assets/images/placeholder.jpg'}" alt="${item.name || ''}">
+      <div class="product-content">
+        <h3>${item.name || "Unnamed"}${badge}</h3>
+        <p class="price">${item.price || ""}</p>
+        <p style="font-size:13px; font-weight:600; color:${stockColor}; margin-top:4px;">
+          ${stockText}
+        </p>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+          <a
+            href="admin-edit.html?id=${id}&category=${category}"
+            class="btn primary"
+            style="flex:1; text-align:center;"
+          >
+            Edit
+          </a>
+          <button
+            class="btn secondary"
+            onclick="deleteItem('${id}', '${category}')"
+            style="flex:1;"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    `;
+      list.appendChild(card);
+    }
+
+    /* 12. Action Functions */
+    window.deleteItem = async (id, category) => {
+      if (!confirm(`Delete this item from ${category}?`)) return;
+      try {
+        await deleteDoc(doc(db, category, id));
+        if (currentTab === 'low-stock') {
+          loadLowStock();
+        } else {
+          loadCollection(currentTab);
+        }
+      } catch (err) {
+        alert("Delete failed: " + err.message);
+      }
+    };
+
+    window.logout = async () => {
+      await signOut(auth);
+      window.location.href = "admin-login.html";
+    };
+  </script>
+
+</body>
+
+</html>

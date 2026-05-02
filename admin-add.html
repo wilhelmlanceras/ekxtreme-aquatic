@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Add Product</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <section style="max-width:600px; margin:60px auto; padding:20px;">
+    <!-- 1. Navigation -->
+    <a href="admin-dashboard.html" class="btn secondary" style="display:inline-block; margin-bottom:20px;">← Back to
+      Dashboard</a>
+
+    <!-- 2. Header -->
+    <h1 style="text-align:center; margin-bottom:20px;">Add New Product</h1>
+
+    <!-- 3. Product Form -->
+    <form id="productForm">
+
+      <!-- Category Selection -->
+      <select id="category" required style="width:100%; padding:10px; margin:8px 0;" onchange="updateFields()">
+        <option value="">Select Category</option>
+        <option value="fish">Fish</option>
+        <option value="tanks">Tanks</option>
+        <option value="food">Food</option>
+        <option value="plants">Plants</option>
+        <option value="equipment">Equipment</option>
+      </select>
+
+      <!-- Common Fields -->
+      <div id="commonFields" style="display:none;">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="price" placeholder="Price (e.g. AED 10.00)" required>
+        <input type="text" id="imageUrl" placeholder="Image URL or local path" required>
+        <img id="preview" style="width:100%; margin-top:10px; display:none; border-radius:10px;">
+        <input type="number" id="stock" placeholder="Stock Quantity" min="0" value="0" required>
+      </div>
+
+      <!-- Fish Fields -->
+      <div id="fishFields" style="display:none;">
+        <input type="text" id="careLevel" placeholder="Care Level (e.g. Easy)">
+        <input type="text" id="tankSize" placeholder="Tank Size (e.g. 60L+)">
+        <input type="text" id="temperament" placeholder="Temperament (e.g. Peaceful)">
+        <input type="text" id="maxSize" placeholder="Max Size (e.g. 6cm)">
+        <input type="text" id="diet" placeholder="Diet (e.g. Omnivore)">
+        <textarea id="fishDescription" placeholder="Description"></textarea>
+
+        <label style="display:flex; align-items:center; gap:10px; margin:10px 0; color:#fff; cursor:pointer;">
+          <input type="checkbox" id="bestSeller" onchange="toggleImageUrlLight()">
+          Mark as Best Seller
+        </label>
+
+        <div id="imageUrlLightWrapper" style="display:none;">
+          <input type="text" id="imageUrlLight" placeholder="Image URL Light or local path">
+        </div>
+      </div>
+
+      <!-- Tank Fields -->
+      <div id="tankFields" style="display:none;">
+        <input type="text" id="capacity" placeholder="Capacity (e.g. 4L)">
+        <input type="text" id="material" placeholder="Material (e.g. Glass)">
+        <textarea id="tankDescription" placeholder="Description"></textarea>
+      </div>
+
+      <!-- Food Fields -->
+      <div id="foodFields" style="display:none;">
+        <input type="text" id="foodType" placeholder="Type (e.g. Granule, Flakes, Frozen)">
+      </div>
+
+      <!-- Submit Section -->
+      <div id="submitWrapper" style="display:none;">
+        <button class="btn primary" type="submit" style="width:100%; margin-top:14px;">
+          Add Product
+        </button>
+      </div>
+
+    </form>
+
+    <!-- Status Message -->
+    <p id="status" style="text-align:center; margin-top:15px;"></p>
+  </section>
+
+  <!-- 4. Firebase Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4nhpU-2RAGys1u9g_Wiudquku2bBimYA",
+      authDomain: "ekxtreme-aquatic.firebaseapp.com",
+      projectId: "ekxtreme-aquatic",
+      storageBucket: "ekxtreme-aquatic.firebasestorage.app",
+      messagingSenderId: "475836775584",
+      appId: "1:475836775584:web:001169a1690998ea265dc5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+    const form = document.getElementById("productForm");
+    const status = document.getElementById("status");
+    const imageUrlEl = document.getElementById("imageUrl");
+    const preview = document.getElementById("preview");
+
+    let currentUser = null;
+
+    /* Auth Check */
+    onAuthStateChanged(auth, (user) => {
+      if (!user) { window.location.href = "admin-login.html"; return; }
+      currentUser = user;
+    });
+
+    /* Image Preview Logic */
+    imageUrlEl.addEventListener("input", () => {
+      const url = imageUrlEl.value.trim();
+      if (url) {
+        preview.src = url;
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    /* UI Toggle Functions */
+    window.updateFields = function () {
+      const cat = document.getElementById("category").value;
+
+      document.getElementById("fishFields").style.display = "none";
+      document.getElementById("tankFields").style.display = "none";
+      document.getElementById("foodFields").style.display = "none";
+
+      document.getElementById("bestSeller").checked = false;
+      document.getElementById("imageUrlLightWrapper").style.display = "none";
+      document.getElementById("imageUrlLight").value = "";
+
+      if (!cat) {
+        document.getElementById("commonFields").style.display = "none";
+        document.getElementById("submitWrapper").style.display = "none";
+        return;
+      }
+
+      document.getElementById("commonFields").style.display = "block";
+      document.getElementById("submitWrapper").style.display = "block";
+
+      if (cat === "fish") document.getElementById("fishFields").style.display = "block";
+      if (cat === "tanks") document.getElementById("tankFields").style.display = "block";
+      if (cat === "food") document.getElementById("foodFields").style.display = "block";
+    };
+
+    window.toggleImageUrlLight = function () {
+      const checked = document.getElementById("bestSeller").checked;
+      document.getElementById("imageUrlLightWrapper").style.display = checked ? "block" : "none";
+      if (!checked) document.getElementById("imageUrlLight").value = "";
+    };
+
+    /* Form Submission */
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) { status.innerText = "Not logged in."; return; }
+
+      const category = document.getElementById("category").value;
+      if (!category) { status.innerText = "Please select a category."; return; }
+
+      try {
+        const id = crypto.randomUUID();
+
+        const data = {
+          name: document.getElementById("name").value.trim(),
+          price: document.getElementById("price").value.trim(),
+          imageUrl: imageUrlEl.value.trim(),
+          stock: parseInt(document.getElementById("stock").value) || 0
+        };
+
+        if (category === "fish") {
+          const isBestSeller = document.getElementById("bestSeller").checked;
+          data.careLevel = document.getElementById("careLevel").value.trim();
+          data.tankSize = document.getElementById("tankSize").value.trim();
+          data.temperament = document.getElementById("temperament").value.trim();
+          data.maxSize = document.getElementById("maxSize").value.trim();
+          data.diet = document.getElementById("diet").value.trim();
+          data.description = document.getElementById("fishDescription").value.trim();
+          data.bestSeller = isBestSeller;
+          if (isBestSeller) {
+            data.imageUrlLight = document.getElementById("imageUrlLight").value.trim();
+          }
+        }
+
+        if (category === "tanks") {
+          data.capacity = document.getElementById("capacity").value.trim();
+          data.material = document.getElementById("material").value.trim();
+          data.description = document.getElementById("tankDescription").value.trim();
+        }
+
+        if (category === "food") {
+          data.type = document.getElementById("foodType").value.trim();
+        }
+
+        Object.keys(data).forEach(key => { if (data[key] === "") delete data[key]; });
+
+        await setDoc(doc(db, category, id), data);
+
+        status.innerText = `✅ "${data.name}" added to "${category}" successfully!`;
+        form.reset();
+        preview.style.display = "none";
+        document.getElementById("commonFields").style.display = "none";
+        document.getElementById("fishFields").style.display = "none";
+        document.getElementById("tankFields").style.display = "none";
+        document.getElementById("foodFields").style.display = "none";
+        document.getElementById("submitWrapper").style.display = "none";
+        document.getElementById("imageUrlLightWrapper").style.display = "none";
+
+      } catch (err) {
+        console.error(err);
+        status.innerText = "❌ " + err.message;
+      }
+    });
+  </script>
+
+</body>
+
+</html>

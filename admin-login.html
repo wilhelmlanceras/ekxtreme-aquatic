@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- 1. Document Setup -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | EKxtreme Aquatic</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <section class="admin-login">
+    <!-- 2. Login UI -->
+    <div class="login-box">
+      <h1>Admin Login</h1>
+      <p>Authorized staff access only</p>
+
+      <form id="loginForm">
+        <input type="email" id="email" placeholder="Admin Email" required>
+
+        <input type="password" id="password" placeholder="Password" required>
+
+        <button type="submit" class="btn primary">
+          Login
+        </button>
+      </form>
+
+      <p id="login-status"></p>
+    </div>
+  </section>
+
+  <script type="module">
+    /* 3. Firebase Configuration */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4nhpU-2RAGys1u9g_Wiudquku2bBimYA",
+      authDomain: "ekxtreme-aquatic.firebaseapp.com",
+      projectId: "ekxtreme-aquatic",
+      storageBucket: "ekxtreme-aquatic.firebasestorage.app",
+      messagingSenderId: "475836775584",
+      appId: "1:475836775584:web:001169a1690998ea265dc5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    /* 4. Login Logic */
+    const form = document.getElementById("loginForm");
+    const status = document.getElementById("login-status");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      try {
+        status.innerText = "Logging in...";
+
+        await signInWithEmailAndPassword(auth, email, password);
+
+        status.innerText = "Login successful!";
+
+        window.location.href = "admin-dashboard.html";
+
+      } catch (error) {
+        console.error(error);
+        status.innerText = error.message;
+      }
+    });
+  </script>
+
+</body>
+
+</html>

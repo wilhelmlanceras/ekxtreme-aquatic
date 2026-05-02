@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- 1. Document Setup -->
+  <meta charset="UTF-8">
+  <title>Edit Product</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+
+  <section style="max-width:600px; margin:60px auto; padding:20px;">
+
+    <!-- 2. Navigation & Header -->
+    <a href="admin-dashboard.html" class="btn secondary" style="display:inline-block; margin-bottom:20px;">
+      ← Back to Dashboard
+    </a>
+
+    <h1 style="text-align:center; margin-bottom:6px;">Edit Product</h1>
+    <p id="categoryLabel"
+      style="text-align:center; color:#2EC4B6; margin-bottom:20px; text-transform:capitalize; font-weight:600;"></p>
+
+    <!-- 3. Edit Form -->
+    <form id="editForm">
+
+      <!-- Common Fields -->
+      <input type="text" id="name" placeholder="Name" required>
+      <input type="text" id="price" placeholder="Price (e.g. AED 10.00)" required>
+      <input type="text" id="imageUrl" placeholder="Image URL or local path" required>
+      <img id="preview" style="width:100%; margin-top:10px; display:none; border-radius:10px;">
+      <input type="number" id="stock" placeholder="Stock Quantity" min="0" value="0">
+
+      <!-- Fish Fields -->
+      <div id="fishFields" style="display:none;">
+        <input type="text" id="careLevel" placeholder="Care Level (e.g. Easy)">
+        <input type="text" id="tankSize" placeholder="Tank Size (e.g. 60L+)">
+        <input type="text" id="temperament" placeholder="Temperament (e.g. Peaceful)">
+        <input type="text" id="maxSize" placeholder="Max Size (e.g. 6cm)">
+        <input type="text" id="diet" placeholder="Diet (e.g. Omnivore)">
+        <textarea id="fishDescription" placeholder="Description"></textarea>
+
+        <label style="display:flex; align-items:center; gap:10px; margin:10px 0; color:#fff; cursor:pointer;">
+          <input type="checkbox" id="bestSeller" onchange="toggleImageUrlLight()">
+          Mark as Best Seller
+        </label>
+
+        <div id="imageUrlLightWrapper" style="display:none;">
+          <input type="text" id="imageUrlLight" placeholder="Image URL Light or local path">
+        </div>
+      </div>
+
+      <!-- Tank Fields -->
+      <div id="tankFields" style="display:none;">
+        <input type="text" id="capacity" placeholder="Capacity (e.g. 4L)">
+        <input type="text" id="material" placeholder="Material (e.g. Glass)">
+        <textarea id="tankDescription" placeholder="Description"></textarea>
+      </div>
+
+      <!-- Food Fields -->
+      <div id="foodFields" style="display:none;">
+        <input type="text" id="foodType" placeholder="Type (e.g. Granule, Flakes, Frozen)">
+      </div>
+
+      <button class="btn primary" type="submit" style="width:100%; margin-top:14px;">
+        Save Changes
+      </button>
+
+    </form>
+
+    <p id="status" style="text-align:center; margin-top:15px;"></p>
+
+  </section>
+
+  <script type="module">
+    /* 4. Firebase Config & Initialization */
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      updateDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import {
+      getAuth,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA4nhpU-2RAGys1u9g_Wiudquku2bBimYA",
+      authDomain: "ekxtreme-aquatic.firebaseapp.com",
+      projectId: "ekxtreme-aquatic",
+      storageBucket: "ekxtreme-aquatic.firebasestorage.app",
+      messagingSenderId: "475836775584",
+      appId: "1:475836775584:web:001169a1690998ea265dc5"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const category = params.get("category");
+
+    const form = document.getElementById("editForm");
+    const status = document.getElementById("status");
+    const imageUrlEl = document.getElementById("imageUrl");
+    const preview = document.getElementById("preview");
+
+    let currentUser = null;
+
+    /* 5. Authentication & Initial Load */
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "admin-login.html"; return; }
+      currentUser = user;
+
+      if (!id || !category) {
+        status.innerText = "Missing product info in URL.";
+        return;
+      }
+
+      showFieldsForCategory(category);
+      await loadProduct();
+    });
+
+    /* 6. Helper Functions */
+    function showFieldsForCategory(cat) {
+      document.getElementById("categoryLabel").innerText = cat;
+      document.getElementById("fishFields").style.display = cat === "fish" ? "block" : "none";
+      document.getElementById("tankFields").style.display = cat === "tanks" ? "block" : "none";
+      document.getElementById("foodFields").style.display = cat === "food" ? "block" : "none";
+    }
+
+    async function loadProduct() {
+      try {
+        const snap = await getDoc(doc(db, category, id));
+
+        if (!snap.exists()) {
+          status.innerText = "Product not found.";
+          return;
+        }
+
+        const d = snap.data();
+
+        document.getElementById("name").value = d.name || "";
+        document.getElementById("price").value = d.price || "";
+        document.getElementById("imageUrl").value = d.imageUrl || "";
+        document.getElementById("stock").value = d.stock ?? 0;
+
+        if (d.imageUrl) {
+          preview.src = d.imageUrl;
+          preview.style.display = "block";
+        }
+
+        if (category === "fish") {
+          document.getElementById("careLevel").value = d.careLevel || "";
+          document.getElementById("tankSize").value = d.tankSize || "";
+          document.getElementById("temperament").value = d.temperament || "";
+          document.getElementById("maxSize").value = d.maxSize || "";
+          document.getElementById("diet").value = d.diet || "";
+          document.getElementById("fishDescription").value = d.description || "";
+          document.getElementById("bestSeller").checked = d.bestSeller || false;
+
+          if (d.bestSeller) {
+            document.getElementById("imageUrlLightWrapper").style.display = "block";
+            document.getElementById("imageUrlLight").value = d.imageUrlLight || "";
+          }
+        }
+
+        if (category === "tanks") {
+          document.getElementById("capacity").value = d.capacity || "";
+          document.getElementById("material").value = d.material || "";
+          document.getElementById("tankDescription").value = d.description || "";
+        }
+
+        if (category === "food") {
+          document.getElementById("foodType").value = d.type || "";
+        }
+
+      } catch (err) {
+        console.error(err);
+        status.innerText = "Error loading product: " + err.message;
+      }
+    }
+
+    window.toggleImageUrlLight = function () {
+      const checked = document.getElementById("bestSeller").checked;
+      document.getElementById("imageUrlLightWrapper").style.display = checked ? "block" : "none";
+      if (!checked) document.getElementById("imageUrlLight").value = "";
+    };
+
+    /* 7. Event Listeners & Form Submission */
+    imageUrlEl.addEventListener("input", () => {
+      const url = imageUrlEl.value.trim();
+      if (url) {
+        preview.src = url;
+        preview.style.display = "block";
+      } else {
+        preview.style.display = "none";
+      }
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!currentUser) { status.innerText = "Not logged in."; return; }
+
+      try {
+        const data = {
+          name: document.getElementById("name").value.trim(),
+          price: document.getElementById("price").value.trim(),
+          imageUrl: imageUrlEl.value.trim(),
+          stock: parseInt(document.getElementById("stock").value) || 0
+        };
+
+        if (category === "fish") {
+          const isBestSeller = document.getElementById("bestSeller").checked;
+          data.careLevel = document.getElementById("careLevel").value.trim();
+          data.tankSize = document.getElementById("tankSize").value.trim();
+          data.temperament = document.getElementById("temperament").value.trim();
+          data.maxSize = document.getElementById("maxSize").value.trim();
+          data.diet = document.getElementById("diet").value.trim();
+          data.description = document.getElementById("fishDescription").value.trim();
+          data.bestSeller = isBestSeller;
+          data.imageUrlLight = isBestSeller
+            ? document.getElementById("imageUrlLight").value.trim()
+            : "";
+        }
+
+        if (category === "tanks") {
+          data.capacity = document.getElementById("capacity").value.trim();
+          data.material = document.getElementById("material").value.trim();
+          data.description = document.getElementById("tankDescription").value.trim();
+        }
+
+        if (category === "food") {
+          data.type = document.getElementById("foodType").value.trim();
+        }
+
+        Object.keys(data).forEach(key => { if (data[key] === "") delete data[key]; });
+
+        await updateDoc(doc(db, category, id), data);
+
+        status.innerText = "✅ Updated successfully!";
+        setTimeout(() => { window.location.href = "admin-dashboard.html"; }, 1000);
+
+      } catch (err) {
+        console.error(err);
+        status.innerText = "❌ " + err.message;
+      }
+    });
+  </script>
+
+</body>
+
+</html>
