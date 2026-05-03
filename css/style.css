@@ -1033,7 +1033,7 @@ section select {
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background-color: rgba(255, 255, 255, 0.05);
-  color: black;
+  color: #ffffff !important;
   font-size: 14px;
   font-family: 'Poppins', sans-serif;
   outline: none;
@@ -1055,6 +1055,7 @@ section select:focus {
 section textarea {
   min-height: 100px;
   resize: vertical;
+  color: #ffffff !important;
 }
 
 section select option {
