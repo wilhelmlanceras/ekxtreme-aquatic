@@ -89,10 +89,7 @@ section {
 .nav-btn {
   background-color: #2EC4B6;
   color: #0B0F14;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 22px;
-  padding-right: 22px;
+  padding: 10px 22px;
   border-radius: 30px;
   text-decoration: none;
   font-weight: 600;
@@ -141,10 +138,7 @@ section {
   display: none;
   flex-direction: column;
   background-color: rgba(7, 10, 15, 0.98);
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-left: 30px;
-  padding-right: 30px;
+  padding: 20px 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -176,10 +170,7 @@ section {
   background-color: #2EC4B6;
   color: #0B0F14;
   text-align: center;
-  padding-top: 12px;
-  padding-bottom: 12px;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding: 12px 24px;
   border-radius: 30px;
   font-weight: 600;
   text-decoration: none;
@@ -267,18 +258,13 @@ section {
   width: 60px;
   height: 3px;
   background-color: #2EC4B6;
-  margin-top: 12px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 12px auto 0;
   border-radius: 10px;
 }
 
 /* 7. UI Components */
 .btn {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  padding-left: 24px;
-  padding-right: 24px;
+  padding: 12px 24px;
   border-radius: 30px;
   text-decoration: none;
   font-weight: 500;
@@ -444,7 +430,7 @@ section {
   padding-right: 10px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.07);
-  background: linear-gradient(180deg, rgba(244, 246, 248, 0.98) 0%, rgba(237, 240, 244, 0.96) 100%);
+  background: linear-gradient(180deg, rgba(244,246,248,0.98) 0%, rgba(237,240,244,0.96) 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
   font-size: 10px;
   line-height: 1.3;
@@ -723,7 +709,7 @@ section {
   width: 100%;
 }
 
-.search-container input {
+.catalog-header .search-container input[type="text"] {
   width: 100%;
   padding-top: 10px;
   padding-bottom: 10px;
@@ -732,12 +718,13 @@ section {
   border-radius: 50px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background-color: #ffffff;
-  color: #0B0F14 !important;
+  color: #0B0F14 !important; 
   font-family: 'Poppins', sans-serif;
   font-size: 14px;
   outline: none;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
   transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+  display: block;
 }
 
 .search-container input:focus {
@@ -837,7 +824,7 @@ section {
   padding-right: 14px;
   border-radius: 999px;
   border: 1px solid rgba(15, 23, 42, 0.07);
-  background: linear-gradient(180deg, rgba(244, 246, 248, 0.98) 0%, rgba(237, 240, 244, 0.96) 100%);
+  background: linear-gradient(180deg, rgba(244,246,248,0.98) 0%, rgba(237,240,244,0.96) 100%);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
   font-size: 13px;
   line-height: 1.3;
@@ -963,7 +950,7 @@ section {
   margin-bottom: 8px;
 }
 
-.login-box>p {
+.login-box > p {
   color: #64748b;
   font-size: 14px;
   margin-bottom: 30px;
@@ -992,7 +979,7 @@ section {
 }
 
 .login-box input:-webkit-autofill,
-.login-box input:-webkit-autofill:hover,
+.login-box input:-webkit-autofill:hover, 
 .login-box input:-webkit-autofill:focus {
   -webkit-text-fill-color: #ffffff;
   -webkit-box-shadow: 0 0 0px 1000px #131920 inset;
@@ -1067,9 +1054,9 @@ section select option {
 }
 
 /* 17. Global Fixes */
-#compatibility,
-#about,
-#testimonials,
+#compatibility, 
+#about, 
+#testimonials, 
 #categories,
 #compatibility-section {
   scroll-margin-top: 120px;
@@ -1099,7 +1086,6 @@ section select option {
 }
 
 @media (max-width: 768px) {
-
   .nav-links,
   .nav-btn {
     display: none;
